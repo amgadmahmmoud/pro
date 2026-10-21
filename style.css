@@ -135,6 +135,7 @@
 		.reservation-content h2 { font-size: clamp(42px, 4.7vw, 58px); }
 		.reservation-copy { max-width: 360px; margin: 15px 0 25px; color: var(--muted); font-size: 13px; line-height: 1.7; }
 		.reservation-form { width: min(100%, 380px); display: flex; flex-direction: column; gap: 9px; }
+		.form-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; }
 		.reservation-form label { margin-top: 8px; font-size: 11px; font-weight: 600; }
 		.reservation-form input, .reservation-form select { width: 100%; height: 43px; padding: 0 11px; border: 1px solid var(--input-border); border-radius: 0; background: transparent; color: var(--ink); font-size: 12px; }
 		.reservation-form input:focus, .reservation-form select:focus { outline: 2px solid var(--green); outline-offset: 1px; }
@@ -142,7 +143,9 @@
 		.form-field { display: flex; flex-direction: column; gap: 9px; }
 		.button-dark { width: 100%; margin-top: 12px; background: var(--green); color: var(--accent-text); }
 		.button-dark:hover { background: var(--green-hover); }
+		.button-dark:disabled { cursor: wait; opacity: .65; transform: none; }
 		.form-message { min-height: 18px; margin: 2px 0 0; color: var(--green); font-size: 12px; }
+		.form-message.is-error { color: var(--red); }
 		.reservation-note { margin: 12px 0 0; color: var(--muted); font-size: 10px; }
 		.reservation-note a { color: var(--green); text-decoration: underline; }
 

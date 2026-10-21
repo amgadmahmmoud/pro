@@ -139,10 +139,12 @@ themeToggle.addEventListener("click", () => {
 	localStorage.setItem("casa-oliva-theme", isDark ? "dark" : "light");
 });
 
-// A date input prevents past-date requests; this demo confirms locally, without a booking server.
+// The static site sends reservation requests to FormSubmit for email delivery.
 const reservationForm = document.querySelector("#reservation-form");
 const dateInput = document.querySelector("#guest-date");
 const formMessage = document.querySelector("#form-message");
+const reservationSubmit = reservationForm.querySelector('button[type="submit"]');
+const formSubmitEndpoint = "https://formsubmit.co/ajax/amgdmahmoud321@gmail.com";
 
 function setMinimumDate() {
 	const today = new Date();
@@ -151,15 +153,48 @@ function setMinimumDate() {
 
 setMinimumDate();
 
-reservationForm.addEventListener("submit", (event) => {
+reservationForm.addEventListener("submit", async (event) => {
 	event.preventDefault();
 
 	const formData = new FormData(reservationForm);
-	const guestName = formData.get("name").trim();
-	const guestCount = formData.get("guests");
-	const visitDate = new Date(`${formData.get("date")}T12:00:00`);
+	const honeypot = formData.get("_honey");
+	if (typeof honeypot === "string" && honeypot.trim()) {
+		return;
+	}
 
-	formMessage.textContent = `Thanks, ${guestName}! Your request for ${guestCount} ${guestCount === "1" ? "guest" : "guests"} on ${visitDate.toLocaleDateString()} is noted. This demo doesn't send a real booking.`;
-	reservationForm.reset();
-	setMinimumDate();
+	const selection = [...order].map(([dish, quantity]) => `${dish.querySelector("h3").textContent} x${quantity}`).join(", ");
+	formData.set("menu_selection", selection || "No menu items selected");
+	const payload = Object.fromEntries(formData.entries());
+	formMessage.classList.remove("is-error");
+	formMessage.textContent = "Sending your request...";
+	reservationSubmit.disabled = true;
+
+	try {
+		const response = await fetch(formSubmitEndpoint, {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(payload),
+		});
+		const result = await response.json();
+		if (!response.ok || !result.success) {
+			throw new Error(result.message || "The email service could not accept your request.");
+		}
+
+		const guestName = String(formData.get("name")).trim();
+		formMessage.textContent = `Thanks, ${guestName}! Your request was emailed to Casa Oliva. Your table is not confirmed until we reply.`;
+		reservationForm.reset();
+		order.clear();
+		renderOrder();
+		setMinimumDate();
+	} catch (error) {
+		formMessage.classList.add("is-error");
+		formMessage.textContent = error instanceof Error
+			? `We couldn't send your request: ${error.message} Please try again or call us.`
+			: "We couldn't send your request. Please try again or call us.";
+	} finally {
+		reservationSubmit.disabled = false;
+	}
 });
