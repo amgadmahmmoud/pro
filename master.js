@@ -151,6 +151,32 @@ function setMinimumDate() {
 	dateInput.min = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 }
 
+let showingValidationMessage = false;
+
+reservationForm.addEventListener("invalid", () => {
+	const invalidFields = [...reservationForm.querySelectorAll(":invalid")];
+	const invalidLabels = invalidFields.map((field) => {
+		const label = [...reservationForm.querySelectorAll("label[for]")].find((item) => item.htmlFor === field.id);
+		return label ? label.textContent.trim() : field.name;
+	});
+
+	formMessage.classList.add("is-error");
+	if (invalidFields.some((field) => field.validity.typeMismatch)) {
+		formMessage.textContent = "Please enter a valid email address.";
+	} else {
+		formMessage.textContent = `Please complete the required fields: ${[...new Set(invalidLabels)].join(", ")}.`;
+	}
+	showingValidationMessage = true;
+}, true);
+
+reservationForm.addEventListener("input", () => {
+	if (showingValidationMessage) {
+		formMessage.classList.remove("is-error");
+		formMessage.textContent = "";
+		showingValidationMessage = false;
+	}
+});
+
 setMinimumDate();
 
 reservationForm.addEventListener("submit", async (event) => {
