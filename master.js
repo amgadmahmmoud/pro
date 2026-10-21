@@ -184,7 +184,7 @@ reservationForm.addEventListener("submit", async (event) => {
 		}
 
 		const guestName = String(formData.get("name")).trim();
-		formMessage.textContent = `Thanks, ${guestName}! Your request was emailed to Casa Oliva. Your table is not confirmed until we reply.`;
+		formMessage.textContent = `Thanks, ${guestName}! Your request was submitted. We'll contact you to confirm; this does not confirm your table.`;
 		reservationForm.reset();
 		order.clear();
 		renderOrder();
